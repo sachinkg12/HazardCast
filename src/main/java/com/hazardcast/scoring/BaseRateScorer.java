@@ -1,8 +1,6 @@
 package com.hazardcast.scoring;
 
 import com.hazardcast.model.CountyFeatureVector;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
 /**
  * Heuristic risk scorer based on historical base rates.
@@ -12,11 +10,8 @@ import org.springframework.stereotype.Component;
  * from domain knowledge. Will be replaced by MachineLearningScorer
  * once the XGBoost model is trained and exported to ONNX.
  *
- * Spring: @ConditionalOnMissingBean ensures this is only used
- *         when no ML scorer is available.
+ * Created by ScoringConfig when no ML model file is available.
  */
-@Component
-@ConditionalOnMissingBean(MachineLearningScorer.class)
 public class BaseRateScorer implements RiskScorer {
 
     // Weights derived from feature correlation analysis with declaration outcomes
