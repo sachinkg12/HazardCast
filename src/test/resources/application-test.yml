@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:hazardcast-test;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  batch:
+    jdbc:
+      initialize-schema: always
+
+hazardcast:
+  api:
+    fema:
+      base-url: https://www.fema.gov/api/open/v2
+      page-size: 100
+    usgs:
+      base-url: https://earthquake.usgs.gov/fdsnws/event/1
+      min-magnitude: 2.5
+  pipeline:
+    feature-window-years: 5
+    prediction-horizon-days: 90
+    parquet-output-dir: ./test-output
+
+logging:
+  level:
+    com.hazardcast: WARN

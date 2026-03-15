@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: hazardcast
+
+  # Default profile uses H2 for quick local dev
+  datasource:
+    url: jdbc:h2:file:./data/hazardcast;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 500
+        order_inserts: true
+        order_updates: true
+
+  sql:
+    init:
+      mode: never  # Hibernate handles schema via ddl-auto
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # jobs triggered via API, not on startup
+
+  h2:
+    console:
+      enabled: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+# Data source API endpoints (all free, no keys)
+hazardcast:
+  api:
+    fema:
+      base-url: https://www.fema.gov/api/open/v2
+      page-size: 1000
+    usgs:
+      base-url: https://earthquake.usgs.gov/fdsnws/event/1
+      min-magnitude: 2.5
+    noaa:
+      base-url: https://www.ncei.noaa.gov/cdo-web/api/v2
+    census:
+      base-url: https://geocoding.geo.census.gov/geocoder
+
+  model:
+    path: ./ml/model/hazardcast_xgb.json  # XGBoost model for ML scorer
+
+  pipeline:
+    feature-window-years: 5    # rolling window for features
+    prediction-horizon-days: 90 # predict declarations 90 days out
+    parquet-output-dir: ./output
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,batch
+
+logging:
+  level:
+    com.hazardcast: DEBUG
+    org.springframework.batch: INFO
+
+---
+spring:
+  config:
+    activate:
+      on-profile: postgres
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hazardcast
+    driver-class-name: org.postgresql.Driver
+    username: hazardcast
+    password: hazardcast
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  h2:
+    console:
+      enabled: false
